@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/GTDev87/MacAttack/issues"
   },
-  "homepage": "https://github.com/GTDev87/MacAttack"
+  "homepage": "https://github.com/GTDev87/MacAttack",
+  "dependencies": {
+    "pegjs": "^0.8.0",
+    "rho-contracts": "0.0.5"
+  }
 }
