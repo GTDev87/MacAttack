@@ -1,5 +1,5 @@
 {
-  "name": "MacAttack",
+  "name": "macattack",
   "version": "0.0.1",
   "description": "Route Mac Cap",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/GTDev87/MacAttack.git"
+    "url": "https://github.com/GTDev87/macattack.git"
   },
   "keywords": [
     "mac"
@@ -16,9 +16,9 @@
   "author": "Gregory Thompson",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/GTDev87/MacAttack/issues"
+    "url": "https://github.com/GTDev87/macattack/issues"
   },
-  "homepage": "https://github.com/GTDev87/MacAttack",
+  "homepage": "https://github.com/GTDev87/macattack",
   "dependencies": {
     "pegjs": "^0.8.0",
     "rho-contracts": "0.0.5"
