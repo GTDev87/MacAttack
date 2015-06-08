@@ -1,4 +1,4 @@
-var MacAttack = require("../lib/MacAttack")
+var MacAttack = require("../lib/macattack")
 
 var urlMac = MacAttack.createMac("http://macattack.com", "/api/length", "my secret", "(([{\"a\": num}...]) -> num)");
 console.log("urlMac = %j", urlMac);

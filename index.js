@@ -1,1 +1,1 @@
-module.exports = require('./lib/MacAttack')
+module.exports = require('./lib/macattack')
