@@ -1,6 +1,6 @@
 {
   "name": "macattack",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Route Mac Cap",
   "main": "index.js",
   "scripts": {
