@@ -25,9 +25,11 @@ console.log("urlGetterConsumerMac = %j", urlGetterConsumerMac);
 var urlGetterNotConsumerMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({\"a\": num, \"b\": (({}) -> str)}) -> num)");
 console.log("urlGetterNotConsumerMac = %j", urlGetterNotConsumerMac);
 
+console.log("testing getting right function mac");
 valid = MacAttack.validateMac(urlGetterConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: urlGetterMac});
 console.log("MacAttack.validateMac valid = %j", valid);
 
+console.log("testing getting wrong function mac");
 notValid = MacAttack.validateMac(urlGetterNotConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: urlGetterMac});
 console.log("MacAttack.validateMac notValid = %j", notValid);
 
