@@ -4,7 +4,8 @@
   "description": "Route Mac Cap",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "node ./node_modules/jasmine/bin/jasmine.js",
+    "debug": "node debug ./node_modules/jasmine/bin/jasmine.js"
   },
   "repository": {
     "type": "git",
@@ -24,5 +25,8 @@
     "macaroons.js": "^0.3.5",
     "pegjs": "^0.8.0",
     "rho-contracts": "0.0.5"
+  },
+  "devDependencies": {
+    "jasmine": "^2.3.1"
   }
 }

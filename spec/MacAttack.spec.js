@@ -1,60 +1,56 @@
-var MacAttack = require("../lib/macattack");
-var parser = require("../lib/parser/parser");
+'use strict';
 
-var urlMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(([{\"a\": num}...]) -> num)");
-console.log("urlMac = %j", urlMac);
+(function () {
+    describe('createMac', function () {
+    	var MacAttack = require("../lib/macattack");
 
-var valid = MacAttack.validateMacFunction(urlMac, "my secret", "/api/length", "GET", [{a: 1}, {a: 2}, {a: 3}], function (arrayObjs) {
-	return arrayObjs.length;
-});
-console.log("MacAttack.validateMacFunction valid = %j", valid);
+    	var arrayObjectLengthMac 					= MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(([{\"a\": num}...]) -> num)");
+    	var numGetterMac         					= MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({}) -> num)");
+    	var numGetterConsumerMac 					= MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({\"a\": num, \"b\": (({}) -> num)}) -> num)");
+    	var stringGetterNotConsumerMac 		= MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({\"a\": num, \"b\": (({}) -> str)}) -> num)");
+    	var numGetterReturningMac       	= MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({}) -> (({}) -> num))");
+	    var stringGetterReturningMac    	= MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({}) -> (({}) -> str))");
+	    var numGetterReturningConsumerMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({\"a\": num, \"b\": (({}) -> (({}) -> num))}) -> num)");
 
-valid = MacAttack.validateMac(urlMac, "my secret", "/api/length", "GET", [{a: 1}, {a: 2}, {a: 3}]);
-console.log("MacAttack.validateMac valid = %j", valid);
+	    beforeEach(function() {});
 
+      it('should validate arguments and returns', function () {
+				var valid = MacAttack.validateMacFunction(arrayObjectLengthMac, "my secret", "/api/length", "GET", [{a: 1}, {a: 2}, {a: 3}], function (arrayObjs) { return arrayObjs.length; });
+				expect(valid).toBe(true);
+			});
 
+			it('should validate only arguments', function () {
+				var valid = MacAttack.validateMac(arrayObjectLengthMac, "my secret", "/api/length", "GET", [{a: 1}, {a: 2}, {a: 3}]);
+				expect(valid).toBe(true);
+			});
 
-//////testing inbed macaroons
+			it('should validate to true if proper mac is in signature', function () {
+				var valid = MacAttack.validateMac(numGetterConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: numGetterMac});
+				expect(valid).toBe(true);
+			});
 
-var urlGetterMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({}) -> num)");
-console.log("urlGetterMac = %j", urlGetterMac);
+			it('should not validate to true if wrong signature mac is in signature', function () {
+				var valid = MacAttack.validateMac(stringGetterNotConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: numGetterMac});
+				expect(valid).toBe(false);
 
-var urlGetterConsumerMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({\"a\": num, \"b\": (({}) -> num)}) -> num)");
-console.log("urlGetterConsumerMac = %j", urlGetterConsumerMac);
+			});
+				
+			it('should check valid signatures of macaroons in request json', function () {
+				var valid = MacAttack.validateMac(numGetterReturningConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: numGetterReturningMac});
+				expect(valid).toBe(true);
+			});
 
-var urlGetterNotConsumerMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({\"a\": num, \"b\": (({}) -> str)}) -> num)");
-console.log("urlGetterNotConsumerMac = %j", urlGetterNotConsumerMac);
+			it('should check invalid signatures of macaroons in request json', function () {
+				var valid = MacAttack.validateMac(numGetterReturningConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: stringGetterReturningMac});
+				expect(valid).toBe(false);
+			});
 
-console.log("testing getting right function mac");
-valid = MacAttack.validateMac(urlGetterConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: urlGetterMac});
-console.log("MacAttack.validateMac valid = %j", valid);
-
-console.log("testing getting wrong function mac");
-notValid = MacAttack.validateMac(urlGetterNotConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: urlGetterMac});
-console.log("MacAttack.validateMac notValid = %j", notValid);
-
-
-var lessComplicatedMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({}) -> (({}) -> num))");
-console.log("lessComplicatedMac = %j", lessComplicatedMac);
-
-var lessComplicatedWrongMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({}) -> (({}) -> str))");
-console.log("lessComplicatedWrongMac = %j", lessComplicatedWrongMac);
-
-var complicatedMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({\"a\": num, \"b\": (({}) -> (({}) -> num))}) -> num)");
-console.log("complicatedMac = %j", complicatedMac);
-
-console.log("testing getting right function mac");
-valid = MacAttack.validateMac(complicatedMac, "my secret", "/api/length", "GET", {a: 1, b: lessComplicatedMac});
-console.log("should be right valid = %j", valid);
-
-console.log("testing getting wong function mac");
-valid = MacAttack.validateMac(complicatedMac, "my secret", "/api/length", "GET", {a: 1, b: lessComplicatedWrongMac});
-console.log("should be wrong valid = %j", valid);
-
-// parser.parse("(([{\"a\": num}...]) -> num)");
-try{
-	var invalidSchemaMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(([{\"a\": num}...]) -> num");
-	console.log("invalidSchemaMac = %j", invalidSchemaMac);
-}catch (e){
-	console.log("good eror");
-}
+			it('should throw error if mac signature is not contructed correctly', function () {
+				var throwing = function() {
+	      	MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(([{\"a\": num}...]) -> num");
+		    };
+		    
+		    expect(throwing).toThrow();
+	    });
+		});
+})();
