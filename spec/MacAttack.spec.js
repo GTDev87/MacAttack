@@ -33,6 +33,24 @@ console.log("testing getting wrong function mac");
 notValid = MacAttack.validateMac(urlGetterNotConsumerMac, "my secret", "/api/length", "GET", {a: 1, b: urlGetterMac});
 console.log("MacAttack.validateMac notValid = %j", notValid);
 
+
+var lessComplicatedMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({}) -> (({}) -> num))");
+console.log("lessComplicatedMac = %j", lessComplicatedMac);
+
+var lessComplicatedWrongMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({}) -> (({}) -> str))");
+console.log("lessComplicatedWrongMac = %j", lessComplicatedWrongMac);
+
+var complicatedMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(({\"a\": num, \"b\": (({}) -> (({}) -> num))}) -> num)");
+console.log("complicatedMac = %j", complicatedMac);
+
+console.log("testing getting right function mac");
+valid = MacAttack.validateMac(complicatedMac, "my secret", "/api/length", "GET", {a: 1, b: lessComplicatedMac});
+console.log("should be right valid = %j", valid);
+
+console.log("testing getting wong function mac");
+valid = MacAttack.validateMac(complicatedMac, "my secret", "/api/length", "GET", {a: 1, b: lessComplicatedWrongMac});
+console.log("should be wrong valid = %j", valid);
+
 // parser.parse("(([{\"a\": num}...]) -> num)");
 try{
 	var invalidSchemaMac = MacAttack.createMac("http://macattack.com", "my secret", "/api/length", "GET", "(([{\"a\": num}...]) -> num");
@@ -40,11 +58,3 @@ try{
 }catch (e){
 	console.log("good eror");
 }
-
-
-
-// var urlMac2 = MacAttack.createMac("http://macattack.com", "my secret", "/api/create", "POST", "(({\"title\": str}) -> (({}) -> {\"title\": str}))");
-// console.log("urlMac = %j", urlMac);
-
-// var urlMac2 = MacAttack.createMac("http://macattack.com", "my secret", "/api/create", "GET", "(((({}) -> {\"title\": str})) -> {\"title\": str})");
-// console.log("urlMac = %j", urlMac);
