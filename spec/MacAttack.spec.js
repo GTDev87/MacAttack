@@ -4,15 +4,23 @@
   describe('createMac', function () {
     var MacAttack = require("../lib/macattack");
 
-    var arrayObjectLengthMac          = MacAttack.createMac("http://macattack.com", 8080, "my secret", "(([{\"a\": num}...]) -> num)");
-    var numGetterMac                  = MacAttack.createMac("http://macattack.com", 8080, "my secret", "(({}) -> num)");
-    var numGetterConsumerMac          = MacAttack.createMac("http://macattack.com", 8080, "my secret", "(({\"a\": num, \"b\": (({}) -> num)}) -> num)");
-    var stringGetterNotConsumerMac    = MacAttack.createMac("http://macattack.com", 8080, "my secret", "(({\"a\": num, \"b\": (({}) -> str)}) -> num)");
-    var numGetterReturningMac         = MacAttack.createMac("http://macattack.com", 8080, "my secret", "(({}) -> (({}) -> num))");
-    var stringGetterReturningMac      = MacAttack.createMac("http://macattack.com", 8080, "my secret", "(({}) -> (({}) -> str))");
-    var numGetterReturningConsumerMac = MacAttack.createMac("http://macattack.com", 8080, "my secret", "(({\"a\": num, \"b\": (({}) -> (({}) -> num))}) -> num)");
+    var arrayObjectLengthMac          = MacAttack.createMacWithSchema("http://macattack.com", 8080, "my secret", "(([{\"a\": num}...]) -> num)");
+    var numGetterMac                  = MacAttack.createMacWithSchema("http://macattack.com", 8080, "my secret", "(({}) -> num)");
+    var numGetterConsumerMac          = MacAttack.createMacWithSchema("http://macattack.com", 8080, "my secret", "(({\"a\": num, \"b\": (({}) -> num)}) -> num)");
+    var stringGetterNotConsumerMac    = MacAttack.createMacWithSchema("http://macattack.com", 8080, "my secret", "(({\"a\": num, \"b\": (({}) -> str)}) -> num)");
+    var numGetterReturningMac         = MacAttack.createMacWithSchema("http://macattack.com", 8080, "my secret", "(({}) -> (({}) -> num))");
+    var stringGetterReturningMac      = MacAttack.createMacWithSchema("http://macattack.com", 8080, "my secret", "(({}) -> (({}) -> str))");
+    var numGetterReturningConsumerMac = MacAttack.createMacWithSchema("http://macattack.com", 8080, "my secret", "(({\"a\": num, \"b\": (({}) -> (({}) -> num))}) -> num)");
 
     beforeEach(function() {});
+
+    it('should create the same macaroon when schema is added', function (){
+      var serializedMac = MacAttack.createMac("http://macattack.com", 8080, "my secret");
+      var addedSchemaSerializedMac = MacAttack.addSchema(serializedMac, "(([{\"a\": num}...]) -> num)");
+
+      var actualSerializedMac = MacAttack.createMacWithSchema("http://macattack.com", 8080, "my secret", "(([{\"a\": num}...]) -> num)");
+      expect(actualSerializedMac).toEqual(addedSchemaSerializedMac);
+    })
 
     it('should validate arguments and returns', function () {
       var valid = MacAttack.validateMacFunction(arrayObjectLengthMac, "my secret", [{a: 1}, {a: 2}, {a: 3}], function (arrayObjs) { return arrayObjs.length; });
@@ -46,7 +54,7 @@
 
     it('should throw error if mac signature is not contructed correctly', function () {
       var throwing = function() {
-        MacAttack.createMac("http://macattack.com", "my secret", "(([{\"a\": num}...]) -> num");
+        MacAttack.createMacWithSchema("http://macattack.com", "my secret", "(([{\"a\": num}...]) -> num");
       };
       
       expect(throwing).toThrow();
