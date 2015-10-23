@@ -26,40 +26,33 @@ var MacaroonsVerifier = require('macaroons.js').MacaroonsVerifier;
       expect(actualSerializedMac).toEqual(addedSchemaSerializedMac);
     });
 
-    // function createMac(ip, port, databaseSecret)
-    // function createMacWithSchema(ip, port, databaseSecret, schema)
-    // function addSchema(serializedMac, schema)
-    // function validateMacFunction(mac, requestData, apiquery, macVerify)
-    // function validateMac(mac, requestData, macVerify)
-    // function validateMacWithChannel(mac, requestData, macVerify)
-
     it('should validate arguments and returns', function () {
-      var validator = MacAttack.validateMacFunction(arrayObjectLengthMac, [{a: 1}, {a: 2}, {a: 3}], function (arrayObjs) { return arrayObjs.length; });
+      var validator = MacAttack.validateMacFunction(new MacaroonsVerifier(arrayObjectLengthMac), [{a: 1}, {a: 2}, {a: 3}], function (arrayObjs) { return arrayObjs.length; });
       expect(validator.isValid(secret)).toBe(true);
     });
 
     it('should validate only arguments', function () {
-      var validator = MacAttack.validateMac(arrayObjectLengthMac, [{a: 1}, {a: 2}, {a: 3}]);
+      var validator = MacAttack.validateMac(new MacaroonsVerifier(arrayObjectLengthMac), [{a: 1}, {a: 2}, {a: 3}]);
       expect(validator.isValid(secret)).toBe(true);
     });
 
     it('should validate to true if proper mac is in signature', function () {
-      var validator = MacAttack.validateMac(numGetterConsumerMac, {a: 1, b: numGetterMac.serialize()});
+      var validator = MacAttack.validateMac(new MacaroonsVerifier(numGetterConsumerMac), {a: 1, b: numGetterMac.serialize()});
       expect(validator.isValid(secret)).toBe(true);
     });
 
     it('should not validate to true if wrong signature mac is in signature', function () {
-      var validator = MacAttack.validateMac(stringGetterNotConsumerMac, {a: 1, b: numGetterMac.serialize()});
+      var validator = MacAttack.validateMac(new MacaroonsVerifier(stringGetterNotConsumerMac), {a: 1, b: numGetterMac.serialize()});
       expect(validator.isValid(secret)).toBe(false);
     });
       
     it('should check valid signatures of macaroons in request json', function () {
-      var validator = MacAttack.validateMac(numGetterReturningConsumerMac, {a: 1, b: numGetterReturningMac.serialize()});
+      var validator = MacAttack.validateMac(new MacaroonsVerifier(numGetterReturningConsumerMac), {a: 1, b: numGetterReturningMac.serialize()});
       expect(validator.isValid(secret)).toBe(true);
     });
 
     it('should check invalid signatures of macaroons in request json', function () {
-      var validator = MacAttack.validateMac(numGetterReturningConsumerMac, {a: 1, b: stringGetterReturningMac.serialize()});
+      var validator = MacAttack.validateMac(new MacaroonsVerifier(numGetterReturningConsumerMac), {a: 1, b: stringGetterReturningMac.serialize()});
       expect(validator.isValid(secret)).toBe(false);
     });
 
