@@ -22,7 +22,7 @@
   "homepage": "https://github.com/GTDev87/macattack",
   "dependencies": {
     "lodash": "^3.9.3",
-    "macaroons.js": "^0.3.5",
+    "node-macaroons": "0.0.5",
     "pegjs": "^0.8.0",
     "rho-contracts": "0.0.5"
   },
